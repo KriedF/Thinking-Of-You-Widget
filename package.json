@@ -1,0 +1,25 @@
+{
+  "name": "thinking-of-you",
+  "version": "1.0.0",
+  "description": "A gentle PWA for letting someone know you're thinking of them",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "build": "mkdir -p www && cp -r public/* www/",
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/cli": "^5.0.0",
+    "@capacitor/core": "^5.0.0"
+  },
+  "keywords": ["grief", "connection", "pwa", "wellness"],
+  "license": "MIT"
+}
