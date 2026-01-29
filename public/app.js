@@ -48,9 +48,14 @@ const elements = {
 };
 
 async function init() {
+  // Register service worker
   if ('serviceWorker' in navigator) {
     try {
-      await navigator.serviceWorker.register('/sw.js');
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('Service worker registered');
+
+      // Subscribe to push notifications after SW is ready
+      navigator.serviceWorker.ready.then(subscribeToPush);
     } catch (e) {
       console.error('Service worker registration failed:', e);
     }
@@ -67,6 +72,57 @@ async function init() {
 
   setupEventListeners();
   setupInstallPrompt();
+}
+
+// Subscribe to push notifications
+async function subscribeToPush(registration) {
+  if (!state.user) return;
+
+  try {
+    // Get VAPID public key from server
+    const response = await fetch('/api/vapid-public-key');
+    const { publicKey } = await response.json();
+
+    // Convert VAPID key to Uint8Array
+    const vapidPublicKey = urlBase64ToUint8Array(publicKey);
+
+    // Check if already subscribed
+    let subscription = await registration.pushManager.getSubscription();
+
+    if (!subscription) {
+      // Subscribe to push
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: vapidPublicKey
+      });
+      console.log('Push subscription created');
+    }
+
+    // Send subscription to server
+    await fetch('/api/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: state.user.id,
+        subscription: subscription.toJSON()
+      })
+    });
+    console.log('Push subscription sent to server');
+  } catch (error) {
+    console.error('Push subscription failed:', error);
+  }
+}
+
+// Helper to convert VAPID key
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
 }
 
 async function loadUser(userId, name) {
@@ -90,6 +146,11 @@ async function loadUser(userId, name) {
       updateHomeScreen();
       showScreen('home');
       elements.bottomNav.style.display = 'block';
+
+      // Subscribe to push after user is loaded
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(subscribeToPush);
+      }
     }
   } catch (e) {
     console.error('Failed to load user:', e);
@@ -118,6 +179,11 @@ async function createUser(name) {
       updateHomeScreen();
       showScreen('home');
       elements.bottomNav.style.display = 'block';
+
+      // Subscribe to push after user is created
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(subscribeToPush);
+      }
     }
   } catch (e) {
     console.error('Failed to create user:', e);
@@ -170,15 +236,6 @@ function handleWebSocketMessage(data) {
 
 function showNotification(data) {
   showToast(data.emoji, data.from, data.message);
-
-  if (Notification.permission === 'granted') {
-    new Notification(`${data.from} ${data.message}`, {
-      icon: '/icons/icon-192.png',
-      badge: '/icons/icon-192.png',
-      vibrate: [100, 50, 100],
-      tag: 'thinking-of-you'
-    });
-  }
 
   if (navigator.vibrate) {
     navigator.vibrate([100, 50, 100]);
@@ -478,7 +535,8 @@ function setupInstallPrompt() {
 
 async function requestNotificationPermission() {
   if ('Notification' in window && Notification.permission === 'default') {
-    await Notification.requestPermission();
+    const permission = await Notification.requestPermission();
+    console.log('Notification permission:', permission);
   }
 }
 

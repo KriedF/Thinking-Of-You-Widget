@@ -4,21 +4,16 @@
   "description": "A gentle PWA for letting someone know you're thinking of them",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node src/server.js",
-    "build": "mkdir -p www && cp -r public/* www/",
-    "cap:sync": "npx cap sync",
-    "cap:open:android": "npx cap open android"
+    "start": "node src/server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
     "ws": "^8.14.2",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "web-push": "^3.6.6"
   },
-  "devDependencies": {
-    "@capacitor/android": "^5.0.0",
-    "@capacitor/cli": "^5.0.0",
-    "@capacitor/core": "^5.0.0"
+  "engines": {
+    "node": ">=18.0.0"
   },
   "keywords": ["grief", "connection", "pwa", "wellness"],
   "license": "MIT"

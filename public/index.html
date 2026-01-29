@@ -63,25 +63,23 @@
       </div>
 
       <div id="addTab" style="display: none; width: 100%;">
-        <div class="onboarding">
-          <h3>Create a connection</h3>
-          <p>Share this code with someone you want to stay connected with:</p>
-
-          <div class="pairing-code" id="pairingCode">---</div>
-          <p class="pairing-timer" id="pairingTimer">Expires in 10:00</p>
-
-          <button class="btn btn-secondary" id="copyCodeBtn">Copy Code</button>
-
-          <div class="divider"><span>or</span></div>
-
-          <h3>Join someone else</h3>
-          <p>Enter their code to connect:</p>
-
-          <div class="input-group">
-            <input type="text" id="joinCodeInput" placeholder="gentle-sun-42" style="text-align: center;">
+        <div class="add-connection-grid">
+          <div class="add-connection-card">
+            <h3>Share your code</h3>
+            <p>Give this code to someone:</p>
+            <div class="pairing-code" id="pairingCode">---</div>
+            <p class="pairing-timer" id="pairingTimer">Expires in 10:00</p>
+            <button class="btn btn-secondary" id="copyCodeBtn">Copy Code</button>
           </div>
 
-          <button class="btn btn-primary" id="joinCodeBtn">Connect</button>
+          <div class="add-connection-card">
+            <h3>Enter their code</h3>
+            <p>Join someone else:</p>
+            <div class="input-group" style="margin-top: 1rem;">
+              <input type="text" id="joinCodeInput" placeholder="gentle-sun-42" style="text-align: center;">
+            </div>
+            <button class="btn btn-primary" id="joinCodeBtn" style="margin-top: 1rem;">Connect</button>
+          </div>
         </div>
       </div>
     </section>

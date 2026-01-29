@@ -509,3 +509,60 @@ body {
     margin-bottom: 2rem;
   }
 }
+
+/* Side-by-side add connection layout */
+.add-connection-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 0 1rem 6rem;
+  width: 100%;
+}
+
+.add-connection-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.add-connection-card h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--warm-gray);
+  margin-bottom: 0.5rem;
+}
+
+.add-connection-card p {
+  font-size: 0.875rem;
+  color: var(--light-gray);
+  margin-bottom: 0.5rem;
+}
+
+.add-connection-card .pairing-code {
+  font-size: 1rem;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  word-break: break-all;
+}
+
+.add-connection-card .pairing-timer {
+  margin-bottom: 0.75rem;
+}
+
+.add-connection-card .input-group {
+  margin-bottom: 0;
+}
+
+.add-connection-card .input-group input {
+  padding: 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Stack on very small screens */
+@media (max-width: 500px) {
+  .add-connection-grid {
+    grid-template-columns: 1fr;
+    padding-bottom: 8rem;
+  }
+}

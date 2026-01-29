@@ -1,4 +1,4 @@
-const CACHE_NAME = 'thinking-of-you-v1';
+const CACHE_NAME = 'thinking-of-you-v2';
 const urlsToCache = ['/', '/index.html', '/styles.css', '/app.js', '/manifest.json'];
 
 self.addEventListener('install', (event) => {
@@ -24,15 +24,56 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(caches.match(event.request).then((response) => response || fetch(event.request)));
 });
 
+// Handle push notifications
 self.addEventListener('push', (event) => {
-  let data = { title: 'Thinking of You', body: 'Someone is thinking of you 💛' };
+  console.log('Push received:', event);
+
+  let data = {
+    title: 'Thinking of You 💛',
+    body: 'Someone is thinking of you'
+  };
+
   if (event.data) {
-    try { data = event.data.json(); } catch (e) { data.body = event.data.text(); }
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data.body = event.data.text();
+    }
   }
-  event.waitUntil(self.registration.showNotification(data.title, { body: data.body, icon: '/icons/icon-192.png', vibrate: [100, 50, 100], tag: 'thinking-of-you', renotify: true }));
+
+  const options = {
+    body: data.body,
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    vibrate: [100, 50, 100, 50, 100],
+    tag: 'thinking-of-you',
+    renotify: true,
+    requireInteraction: false,
+    data: data.data || {}
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
 });
 
+// Handle notification click
 self.addEventListener('notificationclick', (event) => {
+  console.log('Notification clicked');
   event.notification.close();
-  event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => clientList.length > 0 ? clientList[0].focus() : clients.openWindow('/')));
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // If app is already open, focus it
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Otherwise open a new window
+      if (clients.openWindow) {
+        return clients.openWindow('/');
+      }
+    })
+  );
 });
